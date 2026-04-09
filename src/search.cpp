@@ -117,7 +117,8 @@ void update_correction_history(const Position& pos,
     const int    mask   = int(m.is_ok());
     const Square to     = m.to_sq_unchecked();
     const Piece  pc     = pos.piece_on(to);
-    const int    bonus2 = (bonus * 253 / 256) * mask;
+int histScale = depth <= 50 ? 250 + (4 * depth) / 50 : 254;
+const int bonus2 = (bonus * histScale / 256) * mask;
     const int    bonus4 = (bonus * 63 / 128) * mask;
     (*(ss - 2)->continuationCorrectionHistory)[pc][to] << bonus2;
     (*(ss - 4)->continuationCorrectionHistory)[pc][to] << bonus4;
@@ -1103,8 +1104,15 @@ moves_loop:  // When in check, search starts here
                             + sharedHistory.pawn_entry(pos)[movedPiece][move.to_sq()];
 
                 // Continuation history based pruning
-                if (history < -4097 * depth)
-                    continue;
+int qmpHistLimit;
+
+if (depth <= 50)
+    qmpHistLimit = (-4097 * depth) / 50;
+else
+    qmpHistLimit = -4097;
+
+if (history < qmpHistLimit)
+    continue;
 
                 history += 71 * mainHistory[us][move.raw()] / 32;
 
