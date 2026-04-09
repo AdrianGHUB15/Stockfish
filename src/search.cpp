@@ -117,7 +117,8 @@ void update_correction_history(const Position& pos,
     const int    mask   = int(m.is_ok());
     const Square to     = m.to_sq_unchecked();
     const Piece  pc     = pos.piece_on(to);
-const int bonus2 = (bonus * 126 / 128) * mask;
+int histScale = Depth <= 50 ? 250 + (4 * depth) / 50 : 254;
+const int bonus2 = (bonus * histScale / 256) * mask;
     const int    bonus4 = (bonus * 63 / 128) * mask;
     (*(ss - 2)->continuationCorrectionHistory)[pc][to] << bonus2;
     (*(ss - 4)->continuationCorrectionHistory)[pc][to] << bonus4;
@@ -1925,12 +1926,8 @@ void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus) {
 void update_quiet_histories(
   const Position& pos, Stack* ss, Search::Worker& workerThread, Move move, int bonus) {
 
-    Color us = pos.side_to_move();// Dynamic quiet-history decay: 250 → 254 from ply 0 → 50
-int histScale = ss->ply <= 50 ? 250 + (4 * ss->ply) / 50 : 254;
-int scaledBonus = bonus * histScale / 256;
-
-workerThread.mainHistory[us][move.raw()] << scaledBonus;  // dynamic decay applied
-
+    Color us = pos.side_to_move();
+    workerThread.mainHistory[us][move.raw()] << bonus;  // Untuned to prevent duplicate effort
 
     if (ss->ply < LOW_PLY_HISTORY_SIZE)
         workerThread.lowPlyHistory[ss->ply][move.raw()] << bonus * 682 / 1024;
