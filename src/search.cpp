@@ -117,8 +117,7 @@ void update_correction_history(const Position& pos,
     const int    mask   = int(m.is_ok());
     const Square to     = m.to_sq_unchecked();
     const Piece  pc     = pos.piece_on(to);
-int histScale = Depth <= 50 ? 250 + (4 * depth) / 50 : 254;
-const int bonus2 = (bonus * histScale / 256) * mask;
+    const int    bonus2 = (bonus * 126 / 128) * mask;
     const int    bonus4 = (bonus * 63 / 128) * mask;
     (*(ss - 2)->continuationCorrectionHistory)[pc][to] << bonus2;
     (*(ss - 4)->continuationCorrectionHistory)[pc][to] << bonus4;
@@ -1103,15 +1102,12 @@ moves_loop:  // When in check, search starts here
                             + (*contHist[1])[movedPiece][move.to_sq()]
                             + sharedHistory.pawn_entry(pos)[movedPiece][move.to_sq()];
 
-                // Continuation history based pruning
-int qmpHistLimit;
+// Continuation history based pruning
+if (history < -4097)
+    continue;
 
-if (depth <= 50)
-    qmpHistLimit = (-4097 * depth) / 50;
-else
-    qmpHistLimit = -4097;
-
-if (history < qmpHistLimit)
+// SEE-based QMP: do not prune quiet moves that win material
+if (pos.see_ge(move, 1))
     continue;
 
                 history += 71 * mainHistory[us][move.raw()] / 32;
