@@ -117,7 +117,7 @@ void update_correction_history(const Position& pos,
     const int    mask   = int(m.is_ok());
     const Square to     = m.to_sq_unchecked();
     const Piece  pc     = pos.piece_on(to);
-int histScale = depth <= 50 ? 250 + (4 * depth) / 50 : 254;
+int histScale = Depth <= 50 ? 250 + (4 * depth) / 50 : 254;
 const int bonus2 = (bonus * histScale / 256) * mask;
     const int    bonus4 = (bonus * 63 / 128) * mask;
     (*(ss - 2)->continuationCorrectionHistory)[pc][to] << bonus2;
