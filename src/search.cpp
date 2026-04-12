@@ -149,7 +149,28 @@ bool is_shuffling(Move move, Stack* const ss, const Position& pos) {
     return move.from_sq() == (ss - 2)->currentMove.to_sq()
         && (ss - 2)->currentMove.from_sq() == (ss - 4)->currentMove.to_sq();
 }
+// === Patch A: Instant Ponder Reply (all definitions here) ===
 
+Move      A_ponderReply      = MOVE_NONE;
+int       A_ponderDepth      = 0;
+TimePoint A_previousMoveTime = 0;
+
+void A_reset() {
+    A_ponderReply      = MOVE_NONE;
+    A_ponderDepth      = 0;
+    A_previousMoveTime = 0;
+}
+
+bool A_should_instant_reply(const TimeManagement& tm) {
+
+    if (A_ponderReply == MOVE_NONE)
+        return false;
+
+    double depthFactor = std::min(2.0, A_ponderDepth / 20.0);
+    TimePoint opt = tm.optimum();
+
+    return A_previousMoveTime > opt * depthFactor;
+}
 }  // namespace
 
 Search::Worker::Worker(SharedState&                    sharedState,
@@ -252,6 +273,13 @@ void Search::Worker::start_searching() {
     // In rare cases, pv() may change the ponder move through syzygy_extend_pv().
     if (bestThread->rootMoves[0].pv.size() > 1)
         ponder = UCIEngine::move(bestThread->rootMoves[0].pv[1], rootPos.is_chess960());
+// === Patch A: instant ponder reply ===
+if (main_manager()->ponderhit && A_should_instant_reply(main_manager()->tm))
+{
+    auto bestmove = UCIEngine::move(A_ponderReply, rootPos.is_chess960());
+    main_manager()->updates.onBestmove(bestmove, "");
+    return;
+}
 
     auto bestmove = UCIEngine::move(bestThread->rootMoves[0].pv[0], rootPos.is_chess960());
     main_manager()->updates.onBestmove(bestmove, ponder);
@@ -442,27 +470,17 @@ void Search::Worker::iterative_deepening() {
         if (!threads.stop)
         {
             completedDepth = rootDepth;
-
+// === Patch A: store ponder reply ===
+if (mainThread && mainThread->ponder && rootMoves[0].pv.size() > 1)
+{
+    A_ponderReply = rootMoves[0].pv[1];
+    A_ponderDepth = rootDepth;
+}
             if (lastIterationPV.empty() || rootMoves[0].pv[0] != lastIterationPV[0])
                 lastBestMoveDepth = rootDepth;
 
             lastIterationPV = rootMoves[0].pv;
         }
-        // === Rule A: Instant Ponder Reply ===
-        if (mainThread && mainThread->ponder && mainThread->stopOnPonderhit)
-        {
-            // previousMoveTime and ponderReply must be tracked externally
-            TimePoint opt = mainThread->tm.optimum();
-            double depthFactor = std::min(2.0, rootDepth / 20.0);
-
-            if (previousMoveTime > opt * depthFactor && ponderReply != Move::none())
-            {
-                rootMoves[0].pv[0] = ponderReply;
-                threads.stop = true;
-                return;
-            }
-        }
-
         // We make sure not to pick an unproven mated-in score,
         // in case this thread prematurely stopped search (aborted-search).
         if (completedDepth != rootDepth && rootMoves[0].score != -VALUE_INFINITE
