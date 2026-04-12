@@ -448,6 +448,20 @@ void Search::Worker::iterative_deepening() {
 
             lastIterationPV = rootMoves[0].pv;
         }
+        // === Rule A: Instant Ponder Reply ===
+        if (mainThread && mainThread->ponder && mainThread->stopOnPonderhit)
+        {
+            // previousMoveTime and ponderReply must be tracked externally
+            TimePoint opt = mainThread->tm.optimum();
+            double depthFactor = std::min(2.0, rootDepth / 20.0);
+
+            if (previousMoveTime > opt * depthFactor && ponderReply != Move::none())
+            {
+                rootMoves[0].pv[0] = ponderReply;
+                threads.stop = true;
+                return;
+            }
+        }
 
         // We make sure not to pick an unproven mated-in score,
         // in case this thread prematurely stopped search (aborted-search).
