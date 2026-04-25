@@ -68,6 +68,9 @@ using namespace Search;
 namespace {
 
 constexpr uint64_t NODES_LIMIT_OUTPUT = 10'000'000;
+// Patch A: root stability tracking
+Move A_lastRootBestMove = Move::none();
+int  A_stableDepthCount = 0;
 
 constexpr int SEARCHEDLIST_CAPACITY = 32;
 using SearchedList                  = ValueList<Move, SEARCHEDLIST_CAPACITY>;
@@ -186,6 +189,9 @@ void Search::Worker::start_searching() {
 
     accumulatorStack.reset();
     lastIterationPV.clear();
+
+A_lastRootBestMove = Move::none();
+A_stableDepthCount = 0;
 
     // Non-main threads go directly to iterative_deepening()
     if (!is_mainthread())
@@ -1321,6 +1327,19 @@ moves_loop:  // When in check, search starts here
 
         if (rootNode)
         {
+// Patch A: root stability tracking
+if (bestMove == A_lastRootBestMove)
+    A_stableDepthCount++;
+else
+{
+    A_lastRootBestMove = bestMove;
+    A_stableDepthCount = 1;
+}
+
+// Instant move trigger
+if (A_stableDepthCount * rootDepth >= 12)  // threshold
+    threads.stop = true;
+
             RootMove& rm = *std::find(rootMoves.begin(), rootMoves.end(), move);
 
             rm.effort += nodes - nodeCount;
