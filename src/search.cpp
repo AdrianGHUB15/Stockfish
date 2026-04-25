@@ -71,6 +71,7 @@ constexpr uint64_t NODES_LIMIT_OUTPUT = 10'000'000;
 // Patch A: root stability tracking
 Move A_lastRootBestMove = Move::none();
 int  A_stableDepthCount = 0;
+bool A_patchAllowed = false;
 
 constexpr int SEARCHEDLIST_CAPACITY = 32;
 using SearchedList                  = ValueList<Move, SEARCHEDLIST_CAPACITY>;
@@ -192,6 +193,14 @@ void Search::Worker::start_searching() {
 
 A_lastRootBestMove = Move::none();
 A_stableDepthCount = 0;
+// Patch A: allow only for go wtime/btime (with optional winc/binc)
+A_patchAllowed =
+    (limits.time[WHITE] || limits.time[BLACK])
+    && !limits.movetime
+    && !limits.depth
+    && !limits.nodes
+    && !limits.infinite
+    && !limits.ponder;
 
     // Non-main threads go directly to iterative_deepening()
     if (!is_mainthread())
@@ -1325,20 +1334,20 @@ moves_loop:  // When in check, search starts here
         if (threads.stop.load(std::memory_order_relaxed))
             return VALUE_ZERO;
 
-        if (rootNode)
-        {
-// Patch A: root stability tracking
-if (bestMove == A_lastRootBestMove)
-    A_stableDepthCount++;
-else
+if (rootNode)
 {
-    A_lastRootBestMove = bestMove;
-    A_stableDepthCount = 1;
-}
+    // Patch A: root stability tracking
+    if (bestMove == A_lastRootBestMove)
+        A_stableDepthCount++;
+    else
+    {
+        A_lastRootBestMove = bestMove;
+        A_stableDepthCount = 1;
+    }
 
-// Instant move trigger
-if (A_stableDepthCount * rootDepth >= 12)  // threshold
-    threads.stop = true;
+    // Patch A trigger: only in time-controlled searches
+    if (A_patchAllowed && A_stableDepthCount >= 16)
+        threads.stop = true;
 
             RootMove& rm = *std::find(rootMoves.begin(), rootMoves.end(), move);
 
