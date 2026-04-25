@@ -199,8 +199,7 @@ A_patchAllowed =
     && !limits.movetime
     && !limits.depth
     && !limits.nodes
-    && !limits.infinite
-    && !limits.ponder;
+    && !limits.infinite;
 
     // Non-main threads go directly to iterative_deepening()
     if (!is_mainthread())
