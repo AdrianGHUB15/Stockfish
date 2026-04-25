@@ -204,7 +204,7 @@ A_patchAllowed =
     // Non-main threads go directly to iterative_deepening()
     if (!is_mainthread())
     {
-
+        iterative_deepening();
         return;
     }
 
