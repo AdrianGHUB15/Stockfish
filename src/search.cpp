@@ -204,7 +204,7 @@ A_patchAllowed =
     // Non-main threads go directly to iterative_deepening()
     if (!is_mainthread())
     {
-        iterative_deepening();
+
         return;
     }
 
@@ -463,7 +463,7 @@ bool Search::Worker::iterative_deepening() {
             lastIterationPV = rootMoves[0].pv;
         }
 // === Patch A: stability-based early stop ===
-if (A_patchAllowed)
+if (is_mainthread() && A_patchAllowed)
 {
     Move best = rootMoves[0].pv[0];
 
@@ -482,6 +482,7 @@ if (A_patchAllowed)
         break; // exit iterative deepening
     }
 }
+
 
         // A mated-in/TB-loss score from an aborted search cannot be trusted: the loss
         // could be delayed or refuted upon exploring the remaining root-moves.
