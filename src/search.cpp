@@ -462,6 +462,26 @@ bool Search::Worker::iterative_deepening() {
 
             lastIterationPV = rootMoves[0].pv;
         }
+// === Patch A: stability-based early stop ===
+if (A_patchAllowed)
+{
+    Move best = rootMoves[0].pv[0];
+
+    if (best == A_lastRootBestMove)
+        A_stableDepthCount++;
+    else
+    {
+        A_lastRootBestMove = best;
+        A_stableDepthCount = 1;
+    }
+
+    // Only trigger after depth >= 2
+    if (A_stableDepthCount >= 16 && rootDepth >= 2)
+    {
+        threads.stop = true;
+        break; // exit iterative deepening
+    }
+}
 
         // A mated-in/TB-loss score from an aborted search cannot be trusted: the loss
         // could be delayed or refuted upon exploring the remaining root-moves.
@@ -1335,19 +1355,6 @@ moves_loop:  // When in check, search starts here
 
 if (rootNode)
 {
-    // Patch A: root stability tracking
-    if (bestMove == A_lastRootBestMove)
-        A_stableDepthCount++;
-    else
-    {
-        A_lastRootBestMove = bestMove;
-        A_stableDepthCount = 1;
-    }
-
-    // Patch A trigger: only in time-controlled searches
-    if (A_patchAllowed && A_stableDepthCount >= 16)
-        threads.stop = true;
-
             RootMove& rm = *std::find(rootMoves.begin(), rootMoves.end(), move);
 
             rm.effort += nodes - nodeCount;
