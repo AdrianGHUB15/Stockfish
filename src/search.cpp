@@ -1256,7 +1256,7 @@ moves_loop:  // When in check, search starts here
 
         r += 714;  // Base reduction offset to compensate for other tweaks
         r -= moveCount * 62;
-        r -= std::abs(correctionValue) / 26131;
+        r -= std::abs(correctionValue) / 24500;
 
         // Increase reduction for cut nodes
         if (cutNode)
