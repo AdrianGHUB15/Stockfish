@@ -418,6 +418,19 @@ inline void Position::do_move(Move m, StateInfo& newSt, const TranspositionTable
 
 inline StateInfo* Position::state() const { return st; }
 
+// Computes a bitboard of all pieces which attack a given square.
+// Slider attacks use the occupied bitboard to indicate occupancy.
+inline Bitboard Position::attackers_to(Square s, Bitboard occupied) const {
+
+    return (attacks_bb<ROOK>(s, occupied) & pieces(ROOK, QUEEN))
+         | (attacks_bb<BISHOP>(s, occupied) & pieces(BISHOP, QUEEN))
+         | (attacks_bb<PAWN>(s, BLACK) & pieces(WHITE, PAWN))
+         | (attacks_bb<PAWN>(s, WHITE) & pieces(BLACK, PAWN))
+         | (attacks_bb<KNIGHT>(s) & pieces(KNIGHT))
+         | (attacks_bb<KING>(s) & pieces(KING));
+}
+
 }  // namespace Stockfish
 
 #endif  // #ifndef POSITION_H_INCLUDED
+
