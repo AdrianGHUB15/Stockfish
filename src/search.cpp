@@ -54,6 +54,12 @@ namespace Stockfish {
 
 static constexpr std::array<int, 16> lmrDivisor = {3307, 2930, 2874, 2818, 3215, 3225, 3224, 2782,
                                                    2858, 2919, 3088, 3275, 3180, 2868, 3006, 3599};
+int CorrDiv      = 26131;   // for r -= abs(correctionValue) / CorrDiv
+int LmrLogScale  = 2834;    // for reductions[i] = int(LmrLogScale / 128.0 * log(i))
+int DmHistScale  = 1081;    // for doubleMargin history term
+TUNE(SetRange(15000, 40000), CorrDiv,     SetDefaultRange);
+TUNE(SetRange(1500,  4000),  LmrLogScale, SetDefaultRange);
+TUNE(SetRange(400,   2000),  DmHistScale, SetDefaultRange);
 
 namespace TB = Tablebases;
 
@@ -652,7 +658,7 @@ void Search::Worker::clear() {
                     h.fill(-552);
 
     for (size_t i = 1; i < reductions.size(); ++i)
-        reductions[i] = int(2834 / 128.0 * std::log(i));
+        reductions[i] = int(LmrLogScale / 128.0 * std::log(i));
 
     refreshTable.clear(network[numaAccessToken]);
 }
@@ -1201,8 +1207,10 @@ moves_loop:  // When in check, search starts here
             if (value < singularBeta)
             {
                 int corrValAdj   = std::abs(correctionValue) / 194822;
-                int doubleMargin = -3 + 201 * PvNode - 157 * !ttCapture - corrValAdj
-                                 - 1081 * ttMoveHistory / 117824 - (ss->ply > rootDepth) * 41;
+            int doubleMargin = -3 + 201 * PvNode - 157 * !ttCapture - corrValAdj
+                   - DmHistScale * ttMoveHistory / 117824
+                   - (ss->ply > rootDepth) * 41;
+
                 int tripleMargin = 72 + 306 * PvNode - 188 * !ttCapture + 84 * ss->ttPv - corrValAdj
                                  - (ss->ply > rootDepth) * 45;
 
@@ -1256,7 +1264,8 @@ moves_loop:  // When in check, search starts here
 
         r += 714;  // Base reduction offset to compensate for other tweaks
         r -= moveCount * 62;
-        r -= std::abs(correctionValue) / 26131;
+  r -= std::abs(correctionValue) / CorrDiv;
+
 
         // Increase reduction for cut nodes
         if (cutNode)
