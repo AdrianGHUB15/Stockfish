@@ -707,7 +707,7 @@ bool Position::legal(Move m) const {
 // Takes a random move and tests whether the move is
 // pseudo-legal. It is used to validate moves from TT that can be corrupted
 // due to SMP concurrent access or hash position key aliasing.
-bool Position::pseudo_legal(const Move m) const {
+inline bool Position::pseudo_legal(const Move m) const {
 
     Color  us   = sideToMove;
     Square from = m.from_sq();
