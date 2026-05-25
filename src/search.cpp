@@ -82,22 +82,24 @@ using SearchedList                  = ValueList<Move, SEARCHEDLIST_CAPACITY>;
 // optimized for require verifications at longer time controls
 
 int correction_value(const Worker& w, const Position& pos, const Stack* const ss) {
-    const Color us     = pos.side_to_move();
-    const auto  m      = (ss - 1)->currentMove;
-    const auto& shared = w.sharedHistory;
-    const int   pcv    = shared.pawn_correction_entry(pos)[us].pawn;
-    const int   micv   = shared.minor_piece_correction_entry(pos)[us].minor;
-    const int   wnpcv  = shared.nonpawn_correction_entry<WHITE>(pos)[us].nonPawnWhite;
-    const int   bnpcv  = shared.nonpawn_correction_entry<BLACK>(pos)[us].nonPawnBlack;
-    const int   cntcv =
-      m.is_ok()
-          ? 8363
-            * ((*(ss - 2)->continuationCorrectionHistory)[pos.piece_on(m.to_sq())][m.to_sq()]
-               + (*(ss - 4)->continuationCorrectionHistory)[pos.piece_on(m.to_sq())][m.to_sq()])
-          : 64549;
+    const Color us = pos.side_to_move();
+    const auto  m  = (ss - 1)->currentMove;
+    const auto& sh = w.sharedHistory;
 
-    return 13345 * pcv + 9280 * micv + 11840 * (wnpcv + bnpcv) + cntcv;
+    const int cntcv =
+        m.is_ok()
+            ? 8363 * ((*(ss - 2)->continuationCorrectionHistory)[pos.piece_on(m.to_sq())][m.to_sq()]
+                    + (*(ss - 4)->continuationCorrectionHistory)[pos.piece_on(m.to_sq())][m.to_sq()])
+            : 64549;
+
+    return
+        13345 * sh.pawn_correction_entry(pos)[us].pawn +
+        9280  * sh.minor_piece_correction_entry(pos)[us].minor +
+        11840 * ( sh.nonpawn_correction_entry<WHITE>(pos)[us].nonPawnWhite
+                + sh.nonpawn_correction_entry<BLACK>(pos)[us].nonPawnBlack ) +
+        cntcv;
 }
+
 
 // Add correctionHistory value to raw staticEval and guarantee evaluation
 // does not hit the tablebase range.
