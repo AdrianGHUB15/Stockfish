@@ -51,9 +51,46 @@
 #include "ucioption.h"
 
 namespace Stockfish {
+int LMR0  = 3307;
+int LMR1  = 2930;
+int LMR2  = 2874;
+int LMR3  = 2818;
+int LMR4  = 3215;
+int LMR5  = 3225;
+int LMR6  = 3224;
+int LMR7  = 2782;
+int LMR8  = 2858;
+int LMR9  = 2919;
+int LMR10 = 3088;
+int LMR11 = 3275;
+int LMR12 = 3180;
+int LMR13 = 2868;
+int LMR14 = 3006;
+int LMR15 = 3599;
 
-static constexpr std::array<int, 16> lmrDivisor = {3307, 2930, 2874, 2818, 3215, 3225, 3224, 2782,
-                                                   2858, 2919, 3088, 3275, 3180, 2868, 3006, 3599};
+// TUNE macros (bounds are examples — adjust as needed)
+TUNE(SetRange(1500, 6000), LMR0,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR1,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR2,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR3,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR4,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR5,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR6,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR7,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR8,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR9,  SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR10, SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR11, SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR12, SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR13, SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR14, SetDefaultRange);
+TUNE(SetRange(1500, 6000), LMR15, SetDefaultRange);
+
+static std::array<int, 16> lmrDivisor = {
+    LMR0, LMR1, LMR2, LMR3, LMR4, LMR5, LMR6, LMR7,
+    LMR8, LMR9, LMR10, LMR11, LMR12, LMR13, LMR14, LMR15
+};
+
 
 namespace TB = Tablebases;
 
