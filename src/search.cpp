@@ -58,9 +58,9 @@ int NUM;
 int MINC;
 int MAXC;
 
-TUNE(SetRange(10, 200), NUM,  SetDefaultRange, 70);
-TUNE(SetRange(1, 10),  MINC, SetDefaultRange, 4);
-TUNE(SetRange(5, 20),  MAXC, SetDefaultRange, 10);
+TUNE(SetRange(10, 200), NUM,  SetDefault, 70);
+TUNE(SetRange(1, 10),  MINC, SetDefault, 4);
+TUNE(SetRange(5, 20),  MAXC, SetDefault, 10);
 
 namespace TB = Tablebases;
 
