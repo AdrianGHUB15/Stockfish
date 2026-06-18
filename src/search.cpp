@@ -57,9 +57,9 @@ int ContHistBonus;
 int ContHistScale;
 int ContHistOffset;
 
-TUNE(ContHistBonus, 1415, 200, 3000);
-TUNE(ContHistScale, 200, 50, 400);
-TUNE(ContHistOffset, 300, 0, 800);
+TUNE(SetRange(200, 3000), ContHistBonus, SetDefault, 1415);
+TUNE(SetRange(50, 400),   ContHistScale, SetDefault, 200);
+TUNE(SetRange(0, 800),    ContHistOffset, SetDefault, 300);
 
 namespace TB = Tablebases;
 
