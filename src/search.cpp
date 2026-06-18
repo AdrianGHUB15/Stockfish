@@ -53,13 +53,14 @@ namespace Stockfish {
 
 static constexpr std::array<int, 16> lmrDivisor = {3307, 2930, 2874, 2818, 3215, 3225, 3224, 2782,
                                                    2858, 2919, 3088, 3275, 3180, 2868, 3006, 3599};
-int ContHistBonus;
-int ContHistScale;
-int ContHistOffset;
+int ContHistBonus = 1415;
+int ContHistScale = 200;
+int ContHistOffset = 300;
 
-TUNE(SetRange(200, 3000), ContHistBonus, SetDefault, 1415);
-TUNE(SetRange(50, 400),   ContHistScale, SetDefault, 200);
-TUNE(SetRange(0, 800),    ContHistOffset, SetDefault, 300);
+TUNE(SetRange(200, 3000), ContHistBonus);
+TUNE(SetRange(50, 400),   ContHistScale);
+TUNE(SetRange(0, 800),    ContHistOffset);
+
 
 namespace TB = Tablebases;
 
