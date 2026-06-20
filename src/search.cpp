@@ -53,6 +53,9 @@ namespace Stockfish {
 
 static constexpr std::array<int, 16> lmrDivisor = {3307, 2930, 2874, 2818, 3215, 3225, 3224, 2782,
                                                    2858, 2919, 3088, 3275, 3180, 2868, 3006, 3599};
+int ContHistBonus  = 2675;
+int ContHistScale  = 378;
+int ContHistOffset = 22;
 
 namespace TB = Tablebases;
 
@@ -1352,7 +1355,8 @@ moves_loop:  // When in check, search starts here
                     value = -search<NonPV>(pos, ss + 1, -(alpha + 1), -alpha, newDepth, !cutNode);
 
                 // Post LMR continuation history updates
-                update_continuation_histories(ss, movedPiece, move.to_sq(), 1415);
+                update_continuation_histories(ss, movedPiece, move.to_sq(), std::min(2675, 378 * depth - 22));
+
             }
         }
 
