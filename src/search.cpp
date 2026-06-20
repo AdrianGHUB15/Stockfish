@@ -839,6 +839,19 @@ Value Search::Worker::search(
     // for us than at the last ply.
     improving         = ss->staticEval > (ss - 2)->staticEval;
     opponentWorsening = ss->staticEval > -(ss - 1)->staticEval;
+bool momentumUp =
+    (ss->staticEval > (ss - 1)->staticEval) &&
+    ((ss - 1)->staticEval > (ss - 2)->staticEval);
+
+bool momentumDown =
+    (ss->staticEval < (ss - 1)->staticEval) &&
+    ((ss - 1)->staticEval < (ss - 2)->staticEval);
+
+if (depth >= 6 && momentumUp && !ss->inCheck)
+    depth -= 2;
+
+if (depth >= 6 && momentumDown && !ss->inCheck)
+    depth++;
 
     // Hindsight adjustment of reductions based on static evaluation difference.
     if (priorReduction >= 3 && !opponentWorsening)
