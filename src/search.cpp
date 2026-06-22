@@ -845,7 +845,22 @@ Value Search::Worker::search(
         depth++;
     if (priorReduction >= 2 && depth >= 2 && ss->staticEval + (ss - 1)->staticEval > 173)
         depth--;
+// Only apply if we have enough history AND eval improved by at least 25 cp over 5 plies
+if (depth >= 10
+    && ss->staticEval >= (ss - 5)->staticEval + 25)
+{
+    int maxAbs = std::max(abs(ss->staticEval), abs((ss - 5)->staticEval));
+    int minAbs = std::min(abs(ss->staticEval), abs((ss - 5)->staticEval));
+    int diff   = maxAbs - minAbs;
 
+    // Extremely stable → reduce by 2
+    if (diff <= 15)
+        depth -= 2;
+
+    // Moderately stable → reduce by 1 (explicitly guarded by >15)
+    if (diff > 15 && diff <= 25)
+        depth --;
+}
     // At non-PV nodes we check for an early TT cutoff
     if (!PvNode && !excludedMove && ttData.depth > depth - (ttData.value <= beta)
         && is_valid(ttData.value)  // Can happen when !ttHit or when access race in probe()
