@@ -845,6 +845,23 @@ Value Search::Worker::search(
         depth++;
     if (priorReduction >= 2 && depth >= 2 && ss->staticEval + (ss - 1)->staticEval > 173)
         depth--;
+    // Eval-trend multi-tier reduction
+    if (depth >= 10 && ss->ply >= 2) {
+
+        // Tier 1: small improvement (10–23 cp)
+        if (ss->staticEval - (ss - 2)->staticEval >= 10
+            && ss->staticEval - (ss - 2)->staticEval < 24)
+            depth--;
+
+        // Tier 2: medium improvement (25–48 cp)
+        else if (ss->staticEval - (ss - 2)->staticEval >= 25
+                 && ss->staticEval - (ss - 2)->staticEval < 49)
+            depth -= 2;
+
+        // Tier 3: large improvement (50+ cp)
+        else if (ss->staticEval - (ss - 2)->staticEval >= 50)
+            depth -= 3;
+    }
 
     // At non-PV nodes we check for an early TT cutoff
     if (!PvNode && !excludedMove && ttData.depth > depth - (ttData.value <= beta)
