@@ -845,6 +845,11 @@ Value Search::Worker::search(
         depth++;
     if (priorReduction >= 2 && depth >= 2 && ss->staticEval + (ss - 1)->staticEval > 173)
         depth--;
+    // If our eval has improved over 4 plies (with a margin), reduce depth.
+    if (depth >= 14 && ss->ply >= 4 
+    && ss->staticEval > (ss - 2)->staticEval + 25
+    && (ss - 2)->staticEval > (ss - 4)->staticEval + 25)
+    depth--;
 
     // At non-PV nodes we check for an early TT cutoff
     if (!PvNode && !excludedMove && ttData.depth > depth - (ttData.value <= beta)
