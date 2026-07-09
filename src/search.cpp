@@ -1277,6 +1277,10 @@ moves_loop:  // When in check, search starts here
             // over current beta
             else if (cutNode)
                 extension = -2;
+ 
+            // If we are on an allNode or cutNode but not a PvNode, increase r to reduce more
+            else if (!PvNode)
+                r += 500;
         }
 
         u64 nodeCount = rootNode ? u64(nodes) : 0;
