@@ -1249,7 +1249,7 @@ moves_loop:  // When in check, search starts here
                 extension =
                   1 + (value < singularBeta - doubleMargin) + (value < singularBeta - tripleMargin);
 
-                depth++;
+                depth += extension - (ss->staticEval > (ss - 2)->staticEval + 73);
             }
 
             // Multi-cut pruning
