@@ -54,6 +54,17 @@ namespace Stockfish {
 
 static constexpr std::array<int, 16> lmrDivisor = {3307, 2930, 2874, 2818, 3215, 3225, 3224, 2782,
                                                    2858, 2919, 3088, 3275, 3180, 2868, 3006, 3599};
+        // Dynamic EMA parameters for root move
+            int Scale          = 32;
+            int ChiNumerator   = 3;
+            int ChiDenominator = 2;   // Chi = 3/2 = 1.5
+            int MinWeight      = 12;  // 37.5% minimum weight
+            int MaxWeight      = 24;  // 75% maximum weight
+
+            TUNE(SetRange(0, 64), Scale);
+            TUNE(SetRange(0, 30), ChiNumerator);
+            TUNE(SetRange(0, 24), MinWeight);
+            TUNE(SetRange(0, 48), MaxWeight);
 
 namespace TB = Tablebases;
 
@@ -1411,13 +1422,6 @@ moves_loop:  // When in check, search starts here
 
             u64 N      = nodes - nodeCount;
             u64 E_prev = std::max(u64(1), rm.effort - N);
-
-            // Dynamic EMA parameters for root move
-            constexpr u64 Scale          = 32;
-            constexpr u64 ChiNumerator   = 3;
-            constexpr u64 ChiDenominator = 2;   // Chi = 3/2 = 1.5
-            constexpr u64 MinWeight      = 12;  // 37.5% minimum weight
-            constexpr u64 MaxWeight      = 24;  // 75% maximum weight
 
             u64 w     = std::clamp((Scale * N * ChiDenominator)
                                      / (N * ChiDenominator + ChiNumerator * E_prev),
