@@ -54,7 +54,8 @@ namespace Stockfish {
 
 static constexpr std::array<int, 16> lmrDivisor = {3307, 2930, 2874, 2818, 3215, 3225, 3224, 2782,
                                                    2858, 2919, 3088, 3275, 3180, 2868, 3006, 3599};
-
+int Margin = 25;
+Tune(SetRange(0, 50), Margin);
 namespace TB = Tablebases;
 
 void syzygy_extend_pv(const OptionsMap&            options,
@@ -844,7 +845,7 @@ Value Search::Worker::search(
     // Similarly, opponentWorsening is true if our static evaluation is better
     // for us than at the last ply.
     improving         = ss->staticEval > (ss - 2)->staticEval;
-    opponentWorsening = ss->staticEval > -(ss - 1)->staticEval;
+    opponentWorsening = ss->staticEval > -(ss - 1)->staticEval + Margin;
 
     // Hindsight adjustment of reductions based on static evaluation difference.
     if (priorReduction >= 3 && !opponentWorsening)
