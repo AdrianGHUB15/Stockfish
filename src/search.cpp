@@ -1423,9 +1423,13 @@ moves_loop:  // When in check, search starts here
             u64 N      = nodes - nodeCount;
             u64 E_prev = std::max(u64(1), rm.effort - N);
 
-            u64 w     = std::clamp((Scale * N * ChiDenominator)
-                                     / (N * ChiDenominator + ChiNumerator * E_prev),
-                                   MinWeight, MaxWeight);
+            u64 w = std::clamp<u64>(
+                (Scale * N * ChiDenominator)
+                / (N * ChiDenominator + ChiNumerator * E_prev),
+                (u64)MinWeight,
+                (u64)MaxWeight
+            );
+
             u64 w_mss = std::min(w, u64(16));
             i64 v2    = i64(value) * std::abs(value);
 
