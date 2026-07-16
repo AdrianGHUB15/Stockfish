@@ -55,7 +55,7 @@ namespace Stockfish {
 static constexpr std::array<int, 16> lmrDivisor = {3307, 2930, 2874, 2818, 3215, 3225, 3224, 2782,
                                                    2858, 2919, 3088, 3275, 3180, 2868, 3006, 3599};
 int Margin = 25;
-Tune(SetRange(0, 50), Margin);
+TUNE(SetRange(0, 50), Margin);
 namespace TB = Tablebases;
 
 void syzygy_extend_pv(const OptionsMap&            options,
