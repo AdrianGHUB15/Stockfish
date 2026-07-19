@@ -845,7 +845,7 @@ Value Search::Worker::search(
     // Similarly, opponentWorsening is true if our static evaluation is better
     // for us than at the last ply.
     improving         = ss->staticEval > (ss - 2)->staticEval;
-    opponentWorsening = ss->staticEval > -(ss - 1)->staticEval;
+    opponentWorsening = ss->staticEval > -(ss - 1)->staticEval + 30;
 
     // Hindsight adjustment of reductions based on static evaluation difference.
     if (priorReduction >= 3 && !opponentWorsening)
