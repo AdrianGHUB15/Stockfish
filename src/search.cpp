@@ -845,13 +845,15 @@ Value Search::Worker::search(
     // false otherwise. The improving flag is used in various pruning heuristics.
     // Similarly, opponentWorsening is true if our static evaluation is better
     // for us than at the last ply.
-    improving         = ss->staticEval > (ss - 2)->staticEval;
-    opponentWorsening = ss->staticEval > -(ss - 1)->staticEval;
+    improving         = ss->staticEval > (ss - 2)->staticEval + 25;
+    opponentWorsening = ss->staticEval > -(ss - 1)->staticEval + 15;
 
     // Hindsight adjustment of reductions based on static evaluation difference.
     if (priorReduction >= 3 && !opponentWorsening)
         depth++;
     if (priorReduction >= 2 && depth >= 2 && ss->staticEval + (ss - 1)->staticEval > 166)
+        depth--;
+    if (ss->staticEval > (ss - 6)->staticEval + 75 && opponentWorsening && depth >= 15)
         depth--;
 
     // At non-PV nodes we check for an early TT cutoff
@@ -998,7 +1000,7 @@ Value Search::Worker::search(
         assert((ss - 1)->currentMove != Move::null());
 
         // Null move dynamic reduction based on depth
-        Depth R = 7 + depth / 3;
+        Depth R = 7 + depth / 3 + (depth > 15) + (ss->staticEval > (ss - 4)->staticEval + 50);
         do_null_move(pos, st, ss);
 
         Value nullValue = -search<NonPV>(pos, ss + 1, -beta, -beta + 1, depth - R, false);
