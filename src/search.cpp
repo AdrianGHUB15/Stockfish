@@ -1417,10 +1417,10 @@ moves_loop:  // When in check, search starts here
 
             // Dynamic EMA parameters for root move
             constexpr u64 Scale          = 32;
-            constexpr u64 ChiNumerator   = 3;
-            constexpr u64 ChiDenominator = 2;   // Chi = 3/2 = 1.5
+            constexpr u64 ChiNumerator   = 274;
+            constexpr u64 ChiDenominator = 600; // Chi = 600/274 ≈ 2.19
             constexpr u64 MinWeight      = 12;  // 37.5% minimum weight
-            constexpr u64 MaxWeight      = 24;  // 75% maximum weight
+            constexpr u64 MaxWeight      = 29;  // 90.6% maximum weight (approx.)
 
             u64 w     = std::clamp((Scale * N * ChiDenominator)
                                      / (N * ChiDenominator + ChiNumerator * E_prev),
