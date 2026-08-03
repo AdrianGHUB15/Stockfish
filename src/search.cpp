@@ -577,8 +577,9 @@ bool Search::Worker::iterative_deepening() {
 
             // If the bestMove is stable over several iterations, reduce time accordingly
             timeReduction = std::clamp(
-              interpolate(double(rootDepth - lastBestMoveDepth), 4.96, 18.79, 0.639, 1.712), 0.629,
-              1.544);
+            0.629, 
+            1.544, 
+            0.639 + (double(rootDepth - lastBestMoveDepth) - 4.96) * (1.712 - 0.639) / (18.79 - 4.96);
 
             double reduction =
               (1.468 + mainThread->previousTimeReduction) / (2.284 * timeReduction);
