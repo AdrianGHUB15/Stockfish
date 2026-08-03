@@ -579,7 +579,7 @@ bool Search::Worker::iterative_deepening() {
             timeReduction = std::clamp(
             0.629, 
             1.544, 
-            0.639 + (double(rootDepth - lastBestMoveDepth) - 4.96) * (1.712 - 0.639) / (18.79 - 4.96);
+            0.639 + (double(rootDepth - lastBestMoveDepth) - 4.96) * (1.712 - 0.639) / (18.79 - 4.96));
 
             double reduction =
               (1.468 + mainThread->previousTimeReduction) / (2.284 * timeReduction);
