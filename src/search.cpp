@@ -981,7 +981,7 @@ Value Search::Worker::search(
     if (!ss->ttPv && depth < 19 && eval >= beta && (!ttData.move || ttCapture) && beta >= -2000
         && eval <= 2000)
     {
-        Value futilityMult = std::min(45 + depth * 4, 85) + std::max((ss->staticEval - beta) / 256, 0);
+        Value futilityMult = std::min(45 + depth * 4, 85) + std::max((ss->staticEval - beta) / 64, 0);
         futilityMult -= 20 * !ss->ttHit;
 
         Value futilityMargin = futilityMult * depth
