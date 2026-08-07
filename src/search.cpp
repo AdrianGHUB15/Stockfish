@@ -984,7 +984,7 @@ if (!is_win(eval)) {
 else if (is_win(eval)) {
     if (!PvNode && eval < alpha - 483 - 318 * depth * depth)
         return qsearch<PV>(pos, ss, alpha, beta);  
-
+}
     // Step 8. Futility pruning: child node
     // The depth condition is important for mate finding.
     if (!ss->ttPv && depth < 19 && eval >= beta && (!ttData.move || ttCapture) && !is_loss(beta)
