@@ -1029,9 +1029,14 @@ Value Search::Worker::search(
         Value nullValue = -search<NonPV>(pos, ss + 1, -beta, -beta + 1, depth - R, false);
 
         undo_null_move(pos);
+       if (nullValue >= 1500) {
+           R -= interpolate((nullValue), 1500, 3000, 1, 3);
+           do_null_move(pos, st, ss);
+           nullValue = -search<NonPV>(pos, ss + 1, -beta, -beta + 1, depth - R, false);
+           undo_null_move(pos);
 
-        // Do not return unproven mate or TB scores
-        if (nullValue >= beta && !is_win(nullValue))
+        }
+        else if (nullValue >= beta)
         {
             if (nmpMinPly || depth < 16)
                 return nullValue;
