@@ -1031,10 +1031,10 @@ Value Search::Worker::search(
         undo_null_move(pos);
 
         // Do not return unproven mate or TB scores
-        if (nullValue >= beta && !is_win(nullValue))
+        if (nullValue >= beta + 10 && !is_win(nullValue))
         {
             if (nmpMinPly || depth < 16)
-                return nullValue;
+                return (661 * beta + 363 * nullValue) / 1024;
 
             assert(!nmpMinPly);  // Recursive verification is not allowed
 
