@@ -1046,8 +1046,8 @@ Value Search::Worker::search(
 
             nmpMinPly = 0;
 
-            if (v >= beta)
-                return nullValue;
+            if (v >= beta + 10)
+                return (661 * beta + 363 * nullValue) / 1024;
         }
     }
 
