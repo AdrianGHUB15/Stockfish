@@ -1048,7 +1048,7 @@ Value Search::Worker::search(
 
             nmpMinPly = 0;
 
-            if (v >= beta)
+            if (v > beta)
                 return nullValue;
         }
     }
