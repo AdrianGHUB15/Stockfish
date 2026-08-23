@@ -1051,6 +1051,8 @@ Value Search::Worker::search(
             if (v >= beta)
                 return nullValue;
         }
+        else if (depth > 6 && beta > nullValue)
+            depth -= std::clamp(1, 4, (beta - nullValue) / 3);
     }
 
     improving |= ss->staticEval >= beta;
