@@ -1051,9 +1051,9 @@ Value Search::Worker::search(
             if (v >= beta)
                 return nullValue;
         }
-        else if (alpha > nullValue)
+        else if (depth > 2 && alpha > nullValue)
                 depth -= 2;
-        else if (beta > nullValue)
+        else if (depth > 1 && beta > nullValue)
                 depth --;
     }
 
