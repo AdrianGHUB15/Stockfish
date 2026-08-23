@@ -1004,7 +1004,7 @@ Value Search::Worker::search(
         if (alpha > v)
             return v;
         else if (v >= alpha)
-            depth++;
+            depth += 2;
     }
 
     // Step 8. Futility pruning: child node
