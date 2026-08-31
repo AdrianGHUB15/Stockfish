@@ -1203,7 +1203,7 @@ moves_loop:  // When in check, search starts here
 
                 // Continuation history based pruning
                 if (history < -4136 * depth)
-                    continue;
+                    return qsearch<NonPV>(pos, ss, alpha, beta);
 
                 history += 69 * mainHistory[us][move.raw()] / 32;
 
