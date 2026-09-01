@@ -988,7 +988,7 @@ Value Search::Worker::search(
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
-    if (eval < alpha - 482 * depth && !seekMate) {
+    if (eval < alpha - 482 * depth && !seekMate && !is_decisive(eval)) {
         constexpr NodeType childNodeType = nodeType == NonPV ? NonPV : PV;
         return qsearch<childNodeType>(pos, ss, alpha, beta);
     }
