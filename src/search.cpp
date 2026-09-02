@@ -1335,7 +1335,7 @@ moves_loop:  // When in check, search starts here
         if ((ss + 1)->cutoffCnt > 1)
             r += 264 + 1095 * ((ss + 1)->cutoffCnt > 2) + 1138 * allNode;
 
-        if (!ttData.bound & BOUND_EXACT && !PvNode)
+        if (!(ttData.bound & BOUND_EXACT) && !PvNode)
             r = r * 5 / 4;
 
         // For first picked move (ttMove) reduce reduction
