@@ -1161,6 +1161,9 @@ moves_loop:  // When in check, search starts here
         if (ss->ttPv)
             r += 929;
 
+        if (delta > 32)
+            r = r * 3 / 4;
+
         // Step 15. Pruning at shallow depths.
         // Depth conditions are important for mate finding.
         if (!rootNode && pos.non_pawn_material(us) && !is_loss(bestValue))
