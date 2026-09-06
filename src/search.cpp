@@ -990,7 +990,6 @@ Value Search::Worker::search(
     // If eval is really low, skip search entirely and return the qsearch value
     if (!PvNode && eval < alpha && !seekMate) {
         Value RazorMult = 120 * depth * depth;
-        futilityMult -= 20 * !ss->ttHit;
 
         Value RazorMargin = RazorMult * depth
                              - (2789 * improving + 335 * opponentWorsening) * RazorMult / 1024
