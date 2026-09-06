@@ -998,7 +998,7 @@ Value Search::Worker::search(
         constexpr NodeType childNodeType = nodeType == NonPV ? NonPV : PV;
 
         if (eval + RazorMargin < alpha)
-            return = qsearch<childNodeType>(pos, ss, alpha, beta);
+            return  qsearch<childNodeType>(pos, ss, alpha, beta);
     }
 
     // Step 9. Futility pruning: child node
