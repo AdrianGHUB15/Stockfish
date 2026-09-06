@@ -55,6 +55,8 @@ namespace Stockfish {
 static constexpr std::array<int, 16> lmrDivisor = {3637, 2787, 2761, 2939, 3171, 3347, 3147, 2762,
                                                    2772, 3106, 3107, 3060, 3112, 2991, 3090, 3542};
 
+int MateMarginExceeded = std::abs(beta) > 1000 || std::abs(alpha) > 1000 || std::abs(eval) > 1000;
+
 namespace TB = Tablebases;
 
 void syzygy_extend_pv(const OptionsMap&            options,
@@ -984,8 +986,6 @@ Value Search::Worker::search(
             && ((ss - 1)->currentMove).type_of() != PROMOTION)
             sharedHistory.pawn_entry(pos)[pos.piece_on(prevSq)][prevSq] << evalDiff * 13;
     }
-
-    int MateMarginExceeded = std::abs(beta) > 1000 || std::abs(alpha) > 1000 || std::abs(eval) > 1000;
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
