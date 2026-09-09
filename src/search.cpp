@@ -972,9 +972,6 @@ Value Search::Worker::search(
         }
     }
 
-    if (ss->inCheck)
-        goto moves_loop;
-
     // Use static evaluation difference to improve quiet move ordering
     if (((ss - 1)->currentMove).is_ok() && !(ss - 1)->inCheck && !priorCapture)
     {
@@ -1008,7 +1005,7 @@ Value Search::Worker::search(
     }
 
     // Step 10. Null move search with verification search
-    if (cutNode && ss->staticEval >= beta - 13 * depth - 47 * improving + 365 && !excludedMove
+    if (!ss->inCheck && cutNode && ss->staticEval >= beta - 13 * depth - 47 * improving + 365 && !excludedMove
         && pos.non_pawn_material(us) && ss->ply >= nmpMinPly && beta >= -2000)
     {
         assert((ss - 1)->currentMove != Move::null());
@@ -1055,7 +1052,7 @@ Value Search::Worker::search(
     // If we have a good enough capture (or queen promotion) and a reduced search
     // returns a value much above beta, we can (almost) safely prune the previous move.
     probCutBeta = beta + 241 - 64 * improving;
-    if (depth >= 3 && !is_decisive(beta) && !(is_valid(ttData.value) && ttData.value < probCutBeta))
+    if (!ss->inCheck && depth >= 3 && !is_decisive(beta) && !(is_valid(ttData.value) && ttData.value < probCutBeta))
     {
         assert(probCutBeta < VALUE_INFINITE && probCutBeta > beta);
 
@@ -1094,8 +1091,6 @@ Value Search::Worker::search(
             }
         }
     }
-
-moves_loop:  // When in check, search starts here
 
     // Step 13. A small ProbCut idea
     probCutBeta = beta + 428;
