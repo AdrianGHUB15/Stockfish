@@ -994,7 +994,7 @@ Value Search::Worker::search(
         int v = qsearch<childNodeType>(pos, ss, alpha, beta);
 
         // v optimizations to not return mate values
-        v = std::clamp(v, -VALUE_MATED_IN_MAX_PLY + 1, VALUE_MATE_IN_MAX_PLY - 1)
+        v = std::clamp(v, -VALUE_MATED_IN_MAX_PLY + 1, VALUE_MATE_IN_MAX_PLY - 1);
             if (v < alpha)
                 return v;
             
