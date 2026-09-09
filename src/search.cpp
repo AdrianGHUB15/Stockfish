@@ -988,8 +988,16 @@ Value Search::Worker::search(
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
-    if (!PvNode && eval < alpha - 482 * depth * depth)
-        return qsearch<NonPV>(pos, ss, alpha, beta);
+    if (eval < alpha - 482 * depth * depth) {
+
+        constexpr NodeType childNodeType = nodeType == NonPV ? NonPV : PV;
+        int v = qsearch<childNodeType>(pos, ss, alpha, beta);
+
+        // v optimizations to not return mate values
+        v = std::clamp(v, -VALUE_MATED_IN_MAX_PLY + 1, VALUE_MATE_IN_MAX_PLY - 1);
+            if (v < alpha)
+                return v;
+    }
 
     // Step 9. Futility pruning: child node
     // The depth condition is important for mate finding. It should NOT be tuned.
