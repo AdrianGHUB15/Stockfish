@@ -1366,6 +1366,9 @@ moves_loop:  // When in check, search starts here
         if (allNode)
             r += r * 276 / (256 * depth + 268);
 
+        if (ttData.bound == BOUND_NONE && !PvNode)
+            r = r * 5 / 4;
+
         // Apply the computed LMR
         if (depth >= 2 && moveCount > 1)
         {
