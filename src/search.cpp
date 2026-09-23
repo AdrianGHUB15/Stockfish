@@ -1007,7 +1007,7 @@ Value Search::Worker::search(
     // If eval is really low, skip search entirely and return the qsearch value
     if (!cutNode && eval < alpha - 342 * depth && !seekMate) {
         constexpr NodeType childNodeType = nodeType == NonPV ? NonPV : PV;
-        int v = qsearch<NonPV>(pos, ss, alpha, beta);
+        int v = qsearch<childNodeType>(pos, ss, alpha, beta);
 
         v = std::clamp(v, VALUE_TB_LOSS_IN_MAX_PLY + 1, VALUE_TB_WIN_IN_MAX_PLY - 1);
         if ((v <= alpha || depth <= 3) && !is_decisive(v))
