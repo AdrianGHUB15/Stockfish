@@ -736,6 +736,10 @@ Value Search::Worker::search(
     constexpr bool PvNode   = nodeType != NonPV;
     constexpr bool rootNode = nodeType == Root;
     const bool     allNode  = !(PvNode || cutNode);
+
+    // The score condition is important for mate finding, it should not be tuned. 
+    // If the value is changed, it should be tested against VALUE_INFINITE.
+
     const bool     seekMate = rootDepth >= 16 && std::abs(rootMoves[pvIdx].score) >= 2000;
 
     // Dive into quiescence search when the depth reaches zero
