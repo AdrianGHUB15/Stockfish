@@ -838,10 +838,7 @@ Value Search::Worker::search(
     // Step 5. Static evaluation of the position
     Value unadjustedStaticEval = VALUE_NONE;
 
-    // Skip early pruning when in check
-    if (ss->inCheck)
-        ss->staticEval = eval = (ss - 2)->staticEval;
-    else if (excludedMove)
+    if (excludedMove)
         unadjustedStaticEval = eval = ss->staticEval;
     else if (ss->ttHit)
     {
