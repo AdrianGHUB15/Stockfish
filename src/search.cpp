@@ -1009,7 +1009,7 @@ Value Search::Worker::search(
         constexpr NodeType childNodeType = nodeType == NonPV ? NonPV : PV;
         int v = qsearch<childNodeType>(pos, ss, alpha, beta);
 
-        v = std::clamp(v, TB_LOSS_IN_MAX_PLY + 10, TB_WIN_IN_MAX_PLY);
+        v = std::clamp(v, VALUE_TB_LOSS_IN_MAX_PLY + 10, VALUE_TB_WIN_IN_MAX_PLY - 10);
 
         if (v <= alpha || depth <= 3)
             return v;
