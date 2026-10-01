@@ -1102,13 +1102,16 @@ Value Search::Worker::search(
             assert(capture);
 
             do_move(pos, move, st, pos.gives_check(move), capture, ss);
+
             // Perform a preliminary qsearch to verify that the move holds
             value = -qsearch<NonPV>(pos, ss + 1, -probCutBeta, -probCutBeta + 1);
 
             // If the qsearch held, perform the regular search
-            if (value >= probCutBeta && probCutDepth > 0)
+            if (value >= probCutBeta) {
+                ProbCutDepth = std::max(ProbCutDepth, 1);
                 value = -search<NonPV>(pos, ss + 1, -probCutBeta, -probCutBeta + 1, probCutDepth,
                                        !cutNode);
+            }
 
             undo_move(pos, move);
 
