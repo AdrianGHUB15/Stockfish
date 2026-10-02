@@ -879,6 +879,7 @@ Value Search::Worker::search(
     // Similarly, opponentWorsening is true if our static evaluation is better
     // for us than at the last ply.
     improving         = ss->staticEval > (ss - 2)->staticEval;
+    HellaImproving    = ss->staticEval > (ss - 2)->staticEval + 50;
     opponentWorsening = ss->staticEval > -(ss - 1)->staticEval;
 
     // Hindsight adjustment of reductions based on static evaluation difference
@@ -1010,7 +1011,7 @@ Value Search::Worker::search(
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
-    if (allNode && eval < alpha - 342 * depth && !seekMate)
+    if (allNode && eval < alpha - (342 - 100 * HellaImproving) * depth && !seekMate)
         return qsearch<NonPV>(pos, ss, alpha, beta);
 
     // Step 9. Futility pruning: child node
