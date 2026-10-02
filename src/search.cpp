@@ -1025,8 +1025,13 @@ Value Search::Worker::search(
                              - (2789 * improving + 335 * opponentWorsening) * futilityMult / 1024
                              + std::abs(correctionValue) / 198435;
 
-        if (eval - futilityMargin >= beta)
-            return (661 * beta + 363 * eval) / 1024;
+        if (eval - futilityMargin >= beta) {
+            constexpr NodeType childNodeType = nodeType == NonPV ? NonPV : PV;
+            Value verif = qsearch<childNodeType>(pos, ss, alpha, beta);
+
+            if (verif - futilityMargin >= beta)
+                return (661 * beta + 363 * eval) / 1024;
+        }
     }
 
     // Step 10. Null move search with verification search
