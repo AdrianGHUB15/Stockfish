@@ -1036,38 +1036,41 @@ Value Search::Worker::search(
     {
         assert((ss - 1)->currentMove != Move::null());
 
-        // Null move dynamic reduction based on depth
-        Depth R = 7 + depth / 3 + std::max((ss->staticEval - beta) / 256, 0);
-        do_null_move(pos, st, ss);
+        Value verif = qsearch<NonPV>(pos, ss, alpha, beta);
+        if (verif >= beta) {
+            // Null move dynamic reduction based on depth
+            Depth R = 7 + depth / 3 + std::max((ss->staticEval - beta) / 256, 0);
+            do_null_move(pos, st, ss);
 
-        Value nullValue = -search<NonPV>(pos, ss + 1, -beta, -beta + 1, depth - R, false);
+            Value nullValue = -search<NonPV>(pos, ss + 1, -beta, -beta + 1, depth - R, false);
 
-        undo_null_move(pos);
+            undo_null_move(pos);
 
-        // Do not return unproven mate or TB scores
-        if (nullValue >= beta && !is_win(nullValue))
-        {
-            if (nmpMinPly || depth < 16)
+            // Do not return unproven mate or TB scores
+            if (nullValue >= beta && !is_win(nullValue))
             {
-                ++ss->priorNMPFailHigh;
-                return nullValue;
+                if (nmpMinPly || depth < 16)
+                {
+                    ++ss->priorNMPFailHigh;
+                    return nullValue;
             }
 
-            // Recursive verification is not allowed
-            assert(!nmpMinPly);
+                // Recursive verification is not allowed
+                assert(!nmpMinPly);
 
-            // Do verification search at high depths, with null move pruning
-            // disabled until ply exceeds nmpMinPly.
-            nmpMinPly = ss->ply + 3 * (depth - R) / 4;
+                // Do verification search at high depths, with null move pruning
+                // disabled until ply exceeds nmpMinPly.
+                nmpMinPly = ss->ply + 3 * (depth - R) / 4;
 
-            Value v = search<NonPV>(pos, ss, beta - 1, beta, depth - R, false);
+                Value v = search<NonPV>(pos, ss, beta - 1, beta, depth - R, false);
 
-            nmpMinPly = 0;
+                nmpMinPly = 0;
 
-            if (v >= beta)
-            {
-                ++ss->priorNMPFailHigh;
-                return nullValue;
+                if (v >= beta)
+                {
+                    ++ss->priorNMPFailHigh;
+                    return nullValue;
+                }
             }
         }
     }
