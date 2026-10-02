@@ -1108,7 +1108,7 @@ Value Search::Worker::search(
 
             // If the qsearch held, perform the regular search
             if (value >= probCutBeta) {
-                ProbCutDepth = std::max(ProbCutDepth, 1);
+                probCutDepth = std::max(probCutDepth, 1);
                 value = -search<NonPV>(pos, ss + 1, -probCutBeta, -probCutBeta + 1, probCutDepth,
                                        !cutNode);
             }
