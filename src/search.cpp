@@ -882,7 +882,7 @@ Value Search::Worker::search(
     opponentWorsening = ss->staticEval > -(ss - 1)->staticEval;
 
     // Hindsight adjustment of reductions based on static evaluation difference
-    if (priorReduction >= 3 && !opponentWorsening)
+    if (!opponentWorsening && priorReduction >= 3)
         depth++;
     if (priorReduction >= 2 && depth >= 2 && ss->staticEval + (ss - 1)->staticEval > 166)
         depth--;
@@ -1010,12 +1010,12 @@ Value Search::Worker::search(
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
-    if (allNode && eval < alpha - 342 * depth && !seekMate)
+    if (allNode && !seekMate && eval < alpha - 342 * depth)
         return qsearch<NonPV>(pos, ss, alpha, beta);
 
     // Step 9. Futility pruning: child node
     // The depth condition is important for mate finding. It should NOT be tuned.
-    if (!ss->ttPv && depth < (seekMate ? 6 : 19) && eval >= beta && (!ttData.move || ttCapture)
+    if (!ss->ttPv && (!ttData.move || ttCapture) && eval >= beta && depth < (seekMate ? 6 : 19) &&
         && !is_loss(beta) && !is_win(eval))
     {
         Value futilityMult = std::min(45 + depth * 4, 85);
@@ -1030,9 +1030,9 @@ Value Search::Worker::search(
     }
 
     // Step 10. Null move search with verification search
-    if (cutNode
-        && ss->staticEval + 50 * ss->priorNMPFailHigh >= beta - 13 * depth - 47 * improving + 365
-        && !excludedMove && pos.non_pawn_material(us) && ss->ply >= nmpMinPly && beta >= -2000)
+    if (cutNode && !excludedMove && pos.non_pawn_material(us) &&
+        ss->ply >= nmpMinPly && beta >= -2000
+        && ss->staticEval + 50 * ss->priorNMPFailHigh >= beta - 13 * depth - 47 * improving + 365)
     {
         assert((ss - 1)->currentMove != Move::null());
 
@@ -1077,14 +1077,14 @@ Value Search::Worker::search(
     // Step 11. Internal iterative reductions
     // At sufficient depth, reduce depth for PV/Cut nodes without a TTMove.
     // (*Scaler) Making IIR more aggressive scales poorly.
-    if (!ss->followPV && !allNode && depth >= 6 && !ttData.move)
+    if (!ss->followPV && !allNode && !ttData.move && depth >= 6)
         depth--;
 
     // Step 12. ProbCut
     // If we have a good enough capture (or queen promotion) and a reduced search
     // returns a value much above beta, we can (almost) safely prune the previous move.
     probCutBeta = beta + 241 - 64 * improving;
-    if (depth >= 3 && !is_decisive(beta) && !(is_valid(ttData.value) && ttData.value < probCutBeta))
+    if (!is_decisive(beta) && !(is_valid(ttData.value) && ttData.value < probCutBeta) && depth >= 3)
     {
         assert(probCutBeta < VALUE_INFINITE && probCutBeta > beta);
 
