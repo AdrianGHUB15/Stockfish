@@ -1127,7 +1127,7 @@ moves_loop:  // When in check, search starts here
 
     // Step 13. A small ProbCut idea
     probCutBeta = beta + 428;
-    if ((ttData.bound & BOUND_LOWER) !is_decisive(beta) && is_valid(ttData.value) && 
+    if ((ttData.bound & BOUND_LOWER) && !is_decisive(beta) && is_valid(ttData.value) && 
         !is_decisive(ttData.value) && ttData.depth >= depth - 4 && ttData.value >= probCutBeta)
         return probCutBeta;
 
