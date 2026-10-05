@@ -882,7 +882,7 @@ Value Search::Worker::search(
     opponentWorsening = ss->staticEval > -(ss - 1)->staticEval;
 
     // Hindsight adjustment of reductions based on static evaluation difference
-    if (priorReduction >= 3 && !opponentWorsening)
+    if (!opponentWorsening && priorReduction >= 3)
         depth++;
     if (priorReduction >= 2 && depth >= 2 && ss->staticEval + (ss - 1)->staticEval > 166)
         depth--;
@@ -1010,13 +1010,12 @@ Value Search::Worker::search(
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
-    if (allNode && eval < alpha - 342 * depth && !seekMate)
+    if (allNode && !seekMate && eval < alpha - 342 * depth)
         return qsearch<NonPV>(pos, ss, alpha, beta);
 
     // Step 9. Futility pruning: child node
     // The depth condition is important for mate finding. It should NOT be tuned.
-    if (!ss->ttPv && depth < (seekMate ? 6 : 19) && eval >= beta && (!ttData.move || ttCapture)
-        && !is_loss(beta) && !is_win(eval))
+    if (!ss->ttPv && (!ttData.move || ttCapture) && eval >= beta && depth < (seekMate ? 6 : 19) && !is_loss(beta) && !is_win(eval))
     {
         Value futilityMult = std::min(45 + depth * 4, 85);
         futilityMult -= 20 * !ss->ttHit;
@@ -1030,9 +1029,9 @@ Value Search::Worker::search(
     }
 
     // Step 10. Null move search with verification search
-    if (cutNode
-        && ss->staticEval + 50 * ss->priorNMPFailHigh >= beta - 13 * depth - 47 * improving + 365
-        && !excludedMove && pos.non_pawn_material(us) && ss->ply >= nmpMinPly && beta >= -2000)
+    if (cutNode && !excludedMove && pos.non_pawn_material(us) &&
+        ss->ply >= nmpMinPly && beta >= -2000
+        && ss->staticEval + 50 * ss->priorNMPFailHigh >= beta - 13 * depth - 47 * improving + 365)
     {
         assert((ss - 1)->currentMove != Move::null());
 
@@ -1077,14 +1076,14 @@ Value Search::Worker::search(
     // Step 11. Internal iterative reductions
     // At sufficient depth, reduce depth for PV/Cut nodes without a TTMove.
     // (*Scaler) Making IIR more aggressive scales poorly.
-    if (!ss->followPV && !allNode && depth >= 6 && !ttData.move)
+    if (!ss->followPV && !allNode && !ttData.move && depth >= 6)
         depth--;
 
     // Step 12. ProbCut
     // If we have a good enough capture (or queen promotion) and a reduced search
     // returns a value much above beta, we can (almost) safely prune the previous move.
     probCutBeta = beta + 241 - 64 * improving;
-    if (depth >= 3 && !is_decisive(beta) && !(is_valid(ttData.value) && ttData.value < probCutBeta))
+    if (!is_decisive(beta) && !(is_valid(ttData.value) && ttData.value < probCutBeta) && depth >= 3)
     {
         assert(probCutBeta < VALUE_INFINITE && probCutBeta > beta);
 
@@ -1128,8 +1127,8 @@ moves_loop:  // When in check, search starts here
 
     // Step 13. A small ProbCut idea
     probCutBeta = beta + 428;
-    if ((ttData.bound & BOUND_LOWER) && ttData.depth >= depth - 4 && ttData.value >= probCutBeta
-        && !is_decisive(beta) && is_valid(ttData.value) && !is_decisive(ttData.value))
+    if ((ttData.bound & BOUND_LOWER) !is_decisive(beta) && is_valid(ttData.value) && 
+        !is_decisive(ttData.value) && ttData.depth >= depth - 4 && ttData.value >= probCutBeta)
         return probCutBeta;
 
     const PieceToHistory* contHist[] = {
@@ -1165,7 +1164,7 @@ moves_loop:  // When in check, search starts here
 
         ss->moveCount = ++moveCount;
 
-        if (rootNode && is_mainthread() && nodes > NODES_LIMIT_OUTPUT)
+        if (rootNode && nodes > NODES_LIMIT_OUTPUT )
         {
             main_manager()->updates.onIter(
               {depth, UCIEngine::move(move, pos.is_chess960()), moveCount + pvIdx});
@@ -1219,7 +1218,7 @@ moves_loop:  // When in check, search starts here
                 // SEE based pruning for captures and checks.
                 // Avoid pruning sacrifices of our last piece for stalemate.
                 int margin = 177 * depth + captHist * 34 / 1024;
-                if ((alpha >= VALUE_DRAW || pos.non_pawn_material(us) != PieceValue[movedPiece])
+                if (pos.non_pawn_material(us) != PieceValue[movedPiece] || alpha >= VALUE_DRAW)
                     && !pos.see_ge(move, -margin))
                     continue;
             }
@@ -1271,9 +1270,9 @@ moves_loop:  // When in check, search starts here
         //
         // (*Scaler) Generally, higher singularBeta (i.e closer to ttValue)
         // and lower extension margins scale well.
-        if (!rootNode && move == ttData.move && !excludedMove && depth >= 6 + ss->ttPv
-            && is_valid(ttData.value) && !is_decisive(ttData.value) && (ttData.bound & BOUND_LOWER)
-            && ttData.depth >= depth - 3 && !is_shuffling(move, ss, pos) && !seekMate)
+        if (move == ttData.move && !rootNode && !seekMate && !excludedMove && is_valid(ttData.value) 
+         && !is_decisive(ttData.value) && (ttData.bound & BOUND_LOWER) && !is_shuffling(move, ss, pos) &&
+         depth >= 6 + ss->ttPv && ttData.depth >= depth - 3)
         {
             Value singularBeta  = ttData.value - (59 + 66 * (ss->ttPv && !PvNode)) * depth / 63;
             Depth singularDepth = newDepth / 2;
@@ -1523,7 +1522,7 @@ moves_loop:  // When in check, search starts here
                 // We record how often the best move has been changed in each iteration.
                 // This information is used for time management. In MultiPV mode,
                 // we must take care to only do this for the first PV line.
-                if (moveCount > 1 && !pvIdx)
+                if (!pvIdx && moveCount > 1)
                     ++bestMoveChanges;
             }
             else
@@ -1584,7 +1583,7 @@ moves_loop:  // When in check, search starts here
     assert(moveCount || !ss->inCheck || excludedMove || !MoveList<LEGAL>(pos).size());
 
     // Adjust best value for fail high cases
-    if (bestValue >= beta && !is_decisive(bestValue) && !is_decisive(alpha))
+    if (!is_decisive(bestValue) && !is_decisive(alpha) && bestValue >= beta)
         bestValue = (bestValue * depth + beta) / (depth + 1);
 
     // All legal moves have been searched: if there are no legal moves, it
@@ -1734,8 +1733,8 @@ Value Search::Worker::qsearch(Position& pos, Stack* ss, Value alpha, Value beta)
     pvHit        = ttHit && ttData.is_pv;
 
     // At non-PV nodes we check for an early TT cutoff
-    if (!PvNode && ttData.depth >= DEPTH_QS && is_valid(ttData.value)
-        && (ttData.bound & (ttData.value >= beta ? BOUND_LOWER : BOUND_UPPER)))
+    if (!PvNode && is_valid(ttData.value) && ttData.depth >= DEPTH_QS 
+    && (ttData.bound & (ttData.value >= beta ? BOUND_LOWER : BOUND_UPPER)))
         return ttData.value;
 
     // Step 4. Static evaluation of the position
