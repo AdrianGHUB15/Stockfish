@@ -1010,8 +1010,23 @@ Value Search::Worker::search(
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
-    if (allNode && eval < alpha - 342 * depth && !seekMate)
-        return qsearch<NonPV>(pos, ss, alpha, beta);
+    if (!cutNode && eval < alpha - (342 + 50 * PvNode) * depth && !seekMate) {      
+        constexpr NodeType childNodeType = nodeType == NonPV ? NonPV : PV;
+        Value v = qsearch<childNodeType>(pos, ss, alpha, alpha + 1);
+            if (v <= alpha)
+                return v; // No unstable search so return immediately
+    
+            else if (v > alpha) {
+                Value v2 = qsearch<childNodeType>(pos, ss, v, v + 1); // At more accurate bounds
+
+                if (v2 <= v)
+                    return v2;
+
+                else if (v2 > v)
+                    depth++; // Very unstable search
+
+            }
+      }
 
     // Step 9. Futility pruning: child node
     // The depth condition is important for mate finding. It should NOT be tuned.
