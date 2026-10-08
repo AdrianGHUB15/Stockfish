@@ -1010,7 +1010,11 @@ Value Search::Worker::search(
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
-    if (allNode && eval < alpha - 342 * depth && !seekMate)
+    if (allNode && eval < alpha - (342 + 12 * 
+        std::min((ss - 1)->cutoffCnt, 10) - 
+        std::min((ss - 1)->cutoffCnt, 10) * 
+        std::min((ss - 1)->cutoffCnt, 10) 
+        / 2) * depth && !seekMate)
         return qsearch<NonPV>(pos, ss, alpha, beta);
 
     // Step 9. Futility pruning: child node
