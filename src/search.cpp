@@ -1033,6 +1033,8 @@ Value Search::Worker::search(
             return (661 * beta + 363 * eval) / 1024;
     }
 
+    improving |= ss->staticEval >= beta;
+
     // Step 10. Null move search with verification search
     if (cutNode
         && ss->staticEval + 50 * ss->priorNMPFailHigh >= beta - 13 * depth - 47 * improving + 365
@@ -1076,8 +1078,6 @@ Value Search::Worker::search(
             }
         }
     }
-
-    improving |= ss->staticEval >= beta;
 
     // Step 11. Internal iterative reductions
     // At sufficient depth, reduce depth for PV/Cut nodes without a TTMove.
