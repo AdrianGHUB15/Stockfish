@@ -1084,6 +1084,11 @@ Value Search::Worker::search(
     if (!ss->followPV && !allNode && depth >= 6 && !ttData.move)
         depth--;
 
+    // Step 12. Internal iterative additions
+    // At low depths, increase depth for all nodes with a TTMove.
+    if (ss->followPV && allNode && depth <= 6 && ttData.move)
+        depth++;
+
     // Step 12. ProbCut
     // If we have a good enough capture (or queen promotion) and a reduced search
     // returns a value much above beta, we can (almost) safely prune the previous move.
