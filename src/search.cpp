@@ -1086,8 +1086,7 @@ Value Search::Worker::search(
         depth--;
 
     // Step 12. Internal iterative additions
-    // increase depth for allNodes without a TTMove.
-    // ((*Scaler) Making IIA more aggressive scales good)??????.
+    // increase depth for allNodes with a TTMove.
     if (ss->followPV && allNode && ttData.move)
         depth++;
 
