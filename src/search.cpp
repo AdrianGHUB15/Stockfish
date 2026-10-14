@@ -1085,6 +1085,13 @@ Value Search::Worker::search(
     if (!ss->followPV && !allNode && depth >= 6 && !ttData.move)
         depth--;
 
+    // Step 12. Internal iterative additions
+    // increase depth for allNodes without a TTMove.
+    // ((*Scaler) Making IIA more aggressive scales good)??????.
+    if (ss->followPV && allNode && ttData.move)
+        depth++;
+
+
     // Step 12. ProbCut
     // If we have a good enough capture (or queen promotion) and a reduced search
     // returns a value much above beta, we can (almost) safely prune the previous move.
