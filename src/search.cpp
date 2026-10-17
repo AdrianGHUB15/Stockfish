@@ -1070,7 +1070,7 @@ Value Search::Worker::search(
             if (v >= beta)
             {
                 ++ss->priorNMPFailHigh;
-                return nullValue;
+                return v;
             }
         }
     }
