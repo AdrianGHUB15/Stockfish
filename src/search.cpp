@@ -1289,7 +1289,7 @@ moves_loop:  // When in check, search starts here
                 int tripleMargin = 70 + 279 * PvNode - 188 * !ttCapture + 81 * ss->ttPv - corrValAdj
                                  - (ss->ply > rootDepth) * 43;
 
-                extension =
+                extension +=
                   1 + (value < singularBeta - doubleMargin) + (value < singularBeta - tripleMargin);
 
                 depth++;
@@ -1301,7 +1301,7 @@ moves_loop:  // When in check, search starts here
             // over the original beta, we assume this expected cut-node is not
             // singular (multiple moves fail high), and we can prune the whole
             // subtree by returning a softbound.
-            else if (value >= beta && !is_decisive(value))
+            if (value >= beta && !is_decisive(value))
             {
                 ttMoveHistory << -421 - 110 * depth;
 
@@ -1325,8 +1325,8 @@ moves_loop:  // When in check, search starts here
 
             // If the ttMove is assumed to fail high over current beta or
             // if we are on a cutNode
-            else if (ttData.value >= beta || cutNode)
-                extension = -3;
+            if (ttData.value >= beta || cutNode)
+                extension -= 3;
         }
 
         u64 nodeCount = rootNode ? u64(nodes) : 0;
