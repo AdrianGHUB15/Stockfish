@@ -1258,6 +1258,10 @@ moves_loop:  // When in check, search starts here
             }
         }
 
+        // Check extension
+            if (ss->inCheck)
+                extension++;
+
         // Step 16. Singular Extensions
         //
         // We check for "only moves": if one move fails high on (alpha, beta) but all
