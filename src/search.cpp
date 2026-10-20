@@ -1075,7 +1075,7 @@ Value Search::Worker::search(
         }
     }
 
-    improving |= ss->staticEval >= beta;
+    improving |= eval >= beta;
 
     // Step 11. Internal iterative reductions
     // At sufficient depth, reduce depth for PV/Cut nodes without a TTMove.
