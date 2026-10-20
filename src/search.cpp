@@ -1063,7 +1063,7 @@ Value Search::Worker::search(
             // disabled until ply exceeds nmpMinPly.
             nmpMinPly = ss->ply + 3 * (depth - R) / 4;
 
-            Value v = search<NonPV>(pos, ss, beta - 1, beta, depth - R, false);
+            Value v = search<NonPV>(pos, ss, nullValue -1, nullValue, depth - R, false);
 
             nmpMinPly = 0;
 
