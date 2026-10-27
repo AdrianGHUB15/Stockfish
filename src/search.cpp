@@ -1333,6 +1333,12 @@ moves_loop:  // When in check, search starts here
             else if (ttData.value >= beta || cutNode)
                 extension = -3;
         }
+        // Early singular extensions
+        else if (depth <= 7 && !ss->inCheck && cutNode) {
+            int margin = alpha - 20 + std::abs(correctionValue / 20000);
+                if (eval <= margin)
+                    extension++;
+        }
 
         u64 nodeCount = rootNode ? u64(nodes) : 0;
 
