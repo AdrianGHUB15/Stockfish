@@ -1394,7 +1394,7 @@ moves_loop:  // When in check, search starts here
             r += (givesCheck ? -r : r) / 4;
 
         // Apply the computed LMR
-        if (depth >= 2 && moveCount > 1)
+        if (moveCount > 1)
         {
             // In general we want to cap the LMR depth search at newDepth, but when
             // reduction is negative, we allow this move a limited search extension
@@ -1427,7 +1427,7 @@ moves_loop:  // When in check, search starts here
         }
 
         // Step 19. Full-depth search when LMR is skipped
-        else if (!PvNode || moveCount > 1)
+        else if (!PvNode)
         {
             // Increase reduction if ttMove is not present
             if (!ttData.move)
