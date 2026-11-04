@@ -76,7 +76,7 @@ constexpr u64 NODES_LIMIT_OUTPUT = 10'000'000;
 int FutilityMult[18] = {49, 53, 57, 61, 65, 69, 73, 77, 81, 85, 85, 85, 85, 85, 85, 85, 85, 85};
 TUNE(SetRange(0, 200), FutilityMult);
 int ttHitMult[18] = {20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20};
-TUNE(SetRange(-100, 100), FutilityMult);
+TUNE(SetRange(-100, 100), ttHitMult);
 
 constexpr int SEARCHEDLIST_CAPACITY = 32;
 using SearchedList                  = ValueList<Move, SEARCHEDLIST_CAPACITY>;
