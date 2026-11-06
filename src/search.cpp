@@ -1367,7 +1367,7 @@ moves_loop:  // When in check, search starts here
             r += 264 + 1095 * ((ss + 1)->cutoffCnt > 2) + 1138 * allNode;
 
         // For first picked move (ttMove) reduce reduction
-        else if (move == ttData.move)
+        if (move == ttData.move)
             r -= 2179;
 
         if (capture)
