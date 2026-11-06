@@ -847,8 +847,10 @@ Value Search::Worker::search(
     Value unadjustedStaticEval = VALUE_NONE;
 
     // Skip early pruning when in check
-    if (ss->inCheck)
+    if (ss->inCheck) {
         ss->staticEval = eval = (ss - 2)->staticEval;
+        -(ss - 1)->staticEval = eval = -(ss - 3)->staticEval;
+    }
     else if (excludedMove)
         unadjustedStaticEval = eval = ss->staticEval;
     else if (ss->ttHit)
