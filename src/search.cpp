@@ -1310,7 +1310,6 @@ moves_loop:  // When in check, search starts here
 
                 else if (value > singularBeta)
                 {
-                singularBeta += (value - singularBeta);
                 singularDepth += std::min(2, (value - singularBeta) / 5);
 
                 ss->excludedMove = move;
