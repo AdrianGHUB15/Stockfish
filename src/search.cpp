@@ -1283,7 +1283,7 @@ moves_loop:  // When in check, search starts here
             // and lower extension margins scale well.
             if (move == ttData.move && !excludedMove && depth >= 6 + ss->ttPv
                 && is_valid(ttData.value) && !is_decisive(ttData.value)
-                && (ttData.bound & BOUND_LOWER) && ttData.depth >= depth - 3
+                && (ttData.bound & BOUND_LOWER) && ttData.depth >= depth - 1
                 && !is_shuffling(move, ss, pos) && !seekMate)
             {
                 Value singularBeta  = ttData.value - (59 + 66 * (ss->ttPv && !PvNode)) * depth / 63;
