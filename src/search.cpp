@@ -778,7 +778,7 @@ Value Search::Worker::search(
     Move  move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, eval, maxValue, probCutBeta;
-    bool  givesCheck, improving, priorCapture, opponentWorsening;
+    bool  givesCheck, improving, priorCapture, opponentWorsening, nullMoved;
     bool  capture, ttCapture;
     int   priorReduction;
     Piece movedPiece;
@@ -1082,6 +1082,7 @@ Value Search::Worker::search(
                 return nullValue;
             }
         }
+        nullMoved = true;
     }
 
     improving |= ss->staticEval >= beta;
@@ -1387,7 +1388,7 @@ moves_loop:  // When in check, search starts here
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 439 / 4096;
 
-        if (!capture && !is_decisive(alpha))
+        if (!capture && !is_decisive(alpha) && !nullMoved)
             r += 3 * std::clamp(alpha - eval, -64, 96);
 
         // Scale up reductions for expected ALL nodes
