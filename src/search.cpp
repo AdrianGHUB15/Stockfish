@@ -298,10 +298,10 @@ bool Search::Worker::iterative_deepening() {
     // Allocate stack with extra size to allow access from (ss - 7) to (ss + 2):
     // (ss - 7) is needed for update_continuation_histories(ss - 1) which accesses (ss - 6),
     // (ss + 2) is needed for initialization of cutOffCnt.
-    Stack  stack[MAX_PLY + 10] = {};
-    Stack* ss                  = stack + 7;
+    Stack stack[MAX_PLY + 11] = {};
+    Stack* ss                 = stack + 8;
 
-    for (int i = 7; i > 0; --i)
+    for (int i = 8; i > 0; --i)
     {
         (ss - i)->continuationHistory =
           &continuationHistory[0][0][NO_PIECE][0];  // Use as a sentinel
@@ -1141,7 +1141,8 @@ moves_loop:  // When in check, search starts here
 
     const PieceToHistory* contHist[] = {
       (ss - 1)->continuationHistory, (ss - 2)->continuationHistory, (ss - 3)->continuationHistory,
-      (ss - 4)->continuationHistory, (ss - 5)->continuationHistory, (ss - 6)->continuationHistory};
+      (ss - 4)->continuationHistory, (ss - 5)->continuationHistory, (ss - 6)->continuationHistory,
+      (ss - 8)->continuationHistory};
 
 
     MovePicker mp(pos, ttData.move, depth, &mainHistory, &lowPlyHistory, &captureHistory, contHist,
@@ -2044,11 +2045,11 @@ void update_all_stats(const Position& pos,
 // Updates the continuation histories for the move pairs formed by
 // the current move and the moves played in previous plies.
 void update_continuation_histories(Stack* ss, Piece pc, Square to, int bonus) {
-    static constexpr std::array<ConthistBonus, 5> conthist_bonuses = {
-      {{1, 520}, {2, 390}, {3, 145}, {4, 251}, {6, 209}}};
+    static constexpr std::array<ConthistBonus, 6> conthist_bonuses = {
+    {{1, 520}, {2, 390}, {3, 145}, {4, 251}, {6, 209}, {8, 100}}};
 
     // Multipliers for positive history consistency
-    constexpr int CMHCMultipliers[] = {94, 103, 110, 106, 119, 126};
+    constexpr int CMHCMultipliers[] = {94, 103, 110, 106, 119, 126, 126};
     int           positiveCount     = 0;
 
     for (const auto [i, weight] : conthist_bonuses)

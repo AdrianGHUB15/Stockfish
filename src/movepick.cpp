@@ -232,6 +232,7 @@ ExtMove* MovePicker::generate_and_score() {
             value += (*continuationHistory[2])[pc][to];
             value += (*continuationHistory[3])[pc][to];
             value += (*continuationHistory[5])[pc][to];
+            value += (*continuationHistory[6])[pc][to];
 
             // bonus for checks
             value += ((pos.check_squares(pt) & to) && pos.see_ge(m, -75)) * 16384;
