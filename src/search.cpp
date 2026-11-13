@@ -999,9 +999,6 @@ Value Search::Worker::search(
         }
     }
 
-    if (ss->inCheck)
-        goto moves_loop;
-
     // Use static evaluation difference to improve quiet move ordering
     if (((ss - 1)->currentMove).is_ok() && !(ss - 1)->inCheck && !priorCapture)
     {
@@ -1012,6 +1009,9 @@ Value Search::Worker::search(
             sharedHistory.pawn_entry(pos)[pos.piece_on(prevSq)][prevSq] << evalDiff * 13;
     }
 
+
+    if (ss->inCheck)
+        goto moves_loop;
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
