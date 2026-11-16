@@ -772,7 +772,7 @@ Value Search::Worker::search(
     Move  move, excludedMove, bestMove;
     Depth extension, newDepth;
     Value bestValue, value, eval, maxValue, probCutBeta;
-    bool  givesCheck, improving, priorCapture, opponentWorsening;
+    bool  givesCheck, improving, priorCapture, opponentWorsening, unreliableEval;
     bool  capture, ttCapture;
     int   priorReduction;
     Piece movedPiece;
@@ -1014,8 +1014,23 @@ Value Search::Worker::search(
 
     // Step 8. Razoring
     // If eval is really low, skip search entirely and return the qsearch value
-    if (allNode && eval < alpha - 342 * depth && !seekMate)
-        return qsearch<NonPV>(pos, ss, alpha, beta);
+    if (allNode && eval < alpha - 342 * depth && !seekMate) {
+        Value v1 = qsearch<NonPV>(pos, ss, alpha, beta);
+        
+        if (v1 <= alpha)
+	    return v1;
+
+        else if (v1 > alpha) {
+            depth++;
+            Value v2 = qsearch<NonPV>(pos, ss, v1, v1 + 1);
+
+            if (v2 <= alpha)
+                return v2;
+        }
+
+        depth++;
+        unreliableEval = true;
+    }
 
     // Step 9. Futility pruning: child node
     // The depth condition is important for mate finding. It should NOT be tuned.
