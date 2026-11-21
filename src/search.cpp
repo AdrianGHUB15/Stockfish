@@ -72,6 +72,8 @@ namespace {
 
 constexpr u64 NODES_LIMIT_OUTPUT = 10'000'000;
 
+int FutilityMult[17] = {54, 84, 70, 80, 86, 78, 85, 97, 91, 105, 100, 93, 106, 106, 100, 92, 88};
+
 constexpr int SEARCHEDLIST_CAPACITY = 32;
 using SearchedList                  = ValueList<Move, SEARCHEDLIST_CAPACITY>;
 
@@ -1028,8 +1030,7 @@ Value Search::Worker::search(
     if (!ss->ttPv && depth < (seekMate ? 6 : 19) && eval >= beta && (!ttData.move || ttCapture)
         && !is_loss(beta) && !is_win(eval))
     {
-        Value futilityMult = std::min(45 + depth * 4, 85);
-        futilityMult -= 20 * !ss->ttHit;
+        Value futilityMult = FutilityMult[depth - 1];
 
         Value futilityMargin = futilityMult * depth
                              - (2789 * improving + 335 * opponentWorsening) * futilityMult / 1024
