@@ -1031,6 +1031,7 @@ Value Search::Worker::search(
         && !is_loss(beta) && !is_win(eval))
     {
         Value futilityMult = FutilityMult[depth - 1];
+        futilityMult -= 20 * !ss->ttHit;
 
         Value futilityMargin = futilityMult * depth
                              - (2789 * improving + 335 * opponentWorsening) * futilityMult / 1024
