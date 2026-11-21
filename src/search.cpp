@@ -52,6 +52,11 @@
 
 namespace Stockfish {
 
+int alphaReduce = 20;
+TUNE(SetRange(-50, 50), alphaReduce);
+int increase = 200;
+TUNE(SetRange(-500, 500), increase);
+
 inline int lmr_divisor(int depth) {
     int d = std::min(depth, 16);
     return 3000 + 7 * (d - 8) * (d - 8);
@@ -71,11 +76,6 @@ using namespace Search;
 namespace {
 
 constexpr u64 NODES_LIMIT_OUTPUT = 10'000'000;
-
-int alphaReduce = 20;
-TUNE(SetRange(-50, 50), alphaReduce);
-int increase = 200;
-TUNE(SetRange(-500, 500), increase);
 
 constexpr int SEARCHEDLIST_CAPACITY = 32;
 using SearchedList                  = ValueList<Move, SEARCHEDLIST_CAPACITY>;
