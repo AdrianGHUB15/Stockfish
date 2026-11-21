@@ -45,6 +45,7 @@
 #include "thread.h"
 #include "timeman.h"
 #include "tt.h"
+#include "tune.h"
 #include "types.h"
 #include "uci.h"
 #include "ucioption.h"
@@ -70,6 +71,11 @@ using namespace Search;
 namespace {
 
 constexpr u64 NODES_LIMIT_OUTPUT = 10'000'000;
+
+int alphaReduce = 20;
+TUNE(SetRange(-50, 50), alphaReduce);
+int increase = 200;
+TUNE(SetRange(-500, 500), increase);
 
 constexpr int SEARCHEDLIST_CAPACITY = 32;
 using SearchedList                  = ValueList<Move, SEARCHEDLIST_CAPACITY>;
@@ -1329,6 +1335,12 @@ moves_loop:  // When in check, search starts here
             // if we are on a cutNode
             else if (ttData.value >= beta || cutNode)
                 extension = -3;
+        }
+        else if (depth <= 7 && !ss->inCheck && cutNode)
+	    int margin = alpha - alphaReduce;
+            margin += std::abs(correctionValue) / increase;
+            if (eval <= margin)
+                extension++;
         }
 
         u64 nodeCount = rootNode ? u64(nodes) : 0;
