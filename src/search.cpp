@@ -1030,6 +1030,8 @@ Value Search::Worker::search(
     if (!ss->ttPv && depth < (seekMate ? 6 : 19) && eval >= beta && (!ttData.move || ttCapture)
         && !is_loss(beta) && !is_win(eval))
     {
+        assert(depth >= 1 && 18 <= depth);
+
         Value futilityMult = FutilityMult[depth - 1];
         futilityMult -= 20 * !ss->ttHit;
 
