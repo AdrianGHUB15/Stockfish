@@ -780,7 +780,7 @@ Value Search::Worker::search(
     Value bestValue, value, eval, maxValue, probCutBeta;
     bool  givesCheck, improving, priorCapture, opponentWorsening;
     bool  capture, ttCapture;
-    int   priorReduction;
+    int   priorReduction, margin;
     Piece movedPiece;
 
     SearchedList capturesSearched;
@@ -1337,7 +1337,7 @@ moves_loop:  // When in check, search starts here
                 extension = -3;
         }
         else if (depth <= 7 && !ss->inCheck && cutNode)
-	    int margin = alpha - alphaReduce;
+	    margin = alpha - alphaReduce;
             margin += std::abs(correctionValue) / increase;
             if (eval <= margin)
                 extension++;
