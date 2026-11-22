@@ -56,12 +56,12 @@ int alphaReduce = 20;
 TUNE(SetRange(-50, 50), alphaReduce);
 int increase = 200;
 TUNE(SetRange(-500, 500), increase);
-float cutNodeVal = 0.5;
-float allNodeVal = 0.5;
-float PvNodeVal  = 0.5;
-TUNE(SetRange(0.01, 1), cutNodeVal);
-TUNE(SetRange(0.01, 1), allNodeVal);
-TUNE(SetRange(0.01, 1), PvNodeVal);
+int cutNodeVal = 50;
+int allNodeVal = 50;
+int pvNodeVal  = 50;
+TUNE(SetRange(1, 100), cutNodeVal);
+TUNE(SetRange(1, 100), allNodeVal);
+TUNE(SetRange(1, 100), pvNodeVal);
 
 inline int lmr_divisor(int depth) {
     int d = std::min(depth, 16);
@@ -1343,9 +1343,9 @@ moves_loop:  // When in check, search starts here
                 extension = -3;
         }
         else if (depth <= 7 && !ss->inCheck
-                 && ((cutNode && cutNodeVal >= 0.5f)
-                     || (!cutNode && !ss->ttPv && allNodeVal >= 0.5f)
-                     || (ss->ttPv && PvNodeVal >= 0.5f))) {
+                 && ((cutNode && cutNodeVal >= 50)
+                     || (!cutNode && !ss->ttPv && allNodeVal >= 50)
+                     || (ss->ttPv && PvNodeVal >= 50))) {
 
             int margin = alpha - alphaReduce;
             margin += std::abs(correctionValue) / increase;
