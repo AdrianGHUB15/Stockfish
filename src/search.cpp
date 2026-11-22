@@ -56,6 +56,12 @@ int alphaReduce = 20;
 TUNE(SetRange(-50, 50), alphaReduce);
 int increase = 200;
 TUNE(SetRange(-500, 500), increase);
+float cutNodeVal = 0.5;
+float allNodeVal = 0.5;
+float PvNodeVal  = 0.5;
+TUNE(SetRange(0.01, 1), cutNodeVal);
+TUNE(SetRange(0.01, 1), allNodeVal);
+TUNE(SetRange(0.01, 1), PvNodeVal);
 
 inline int lmr_divisor(int depth) {
     int d = std::min(depth, 16);
@@ -1336,13 +1342,17 @@ moves_loop:  // When in check, search starts here
             else if (ttData.value >= beta || cutNode)
                 extension = -3;
         }
-        else if (depth <= 7 && !ss->inCheck && cutNode) {
-	    int margin = alpha - alphaReduce;
+        else if (depth <= 7 && !ss->inCheck
+                 && ((cutNode && cutNodeVal >= 0.5f)
+                     || (!cutNode && !ss->ttPv && allNodeVal >= 0.5f)
+                     || (ss->ttPv && PvNodeVal >= 0.5f))) {
+
+            int margin = alpha - alphaReduce;
             margin += std::abs(correctionValue) / increase;
+
             if (eval <= margin)
                 extension++;
         }
-
         u64 nodeCount = rootNode ? u64(nodes) : 0;
 
         // Step 17. Make the move
